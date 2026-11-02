@@ -250,7 +250,7 @@ export default function EuanDashboard() {
         <span>
           Built on{' '}
           <a href="https://github.com/yihong0618/running_page">running_page</a>{' '}
-          · Maps © CARTO © OpenStreetMap
+          · Maps © OpenFreeMap © OpenMapTiles © OpenStreetMap
         </span>
       </footer>
     </div>

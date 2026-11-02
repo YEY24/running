@@ -48,7 +48,7 @@ In **YEY24/running → Settings → Secrets and variables → Actions → New re
 
 Enter the values directly on GitHub. Do not paste them into chat, source files, workflow YAML, screenshots, or command arguments. The website only issues GET requests; an Intervals API key may have broader account permissions, so treat it accordingly.
 
-No Strava credentials, Apple credentials, personal GitHub token, Mapbox account, or map token are required for this setup. Deployment uses GitHub's automatic short-lived workflow identity. The map uses the upstream dashboard's CARTO fallback and retains attribution; external map services receive ordinary browser map requests.
+No Strava credentials, Apple credentials, personal GitHub token, Mapbox account, or map token are required for this setup. Deployment uses GitHub's automatic short-lived workflow identity. The map uses MapLibre and OpenFreeMap with attribution; external map services receive ordinary browser map requests. CARTO now requires its own key, so the prepared theme does not use its old fallback. If the map service is unavailable, route outlines remain visible.
 
 ## 4. Enable GitHub Pages and run the first sync
 
