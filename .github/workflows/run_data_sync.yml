@@ -3,6 +3,8 @@ name: Sync and publish running dashboard
 on:
   push:
     branches: [main, master]
+    paths-ignore:
+      - .github/workflows/recover-deployment.yml
   workflow_dispatch:
   schedule:
     # Daily 05:17 UTC = 06:17 CET / 07:17 CEST. GitHub can delay scheduled runs.
