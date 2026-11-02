@@ -1,0 +1,10 @@
+# Kept as an explicit pointer so the upstream deployment workflow cannot race the personal sync.
+name: Legacy deployment (use Sync and publish)
+on:
+  workflow_dispatch:
+jobs:
+  instructions:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - run: echo 'Run the Sync and publish running dashboard workflow instead.'

@@ -1,0 +1,7 @@
+# Personal dashboard: public settings only. Secrets belong in GitHub Secrets.
+mapbox_token: ''
+avatar: ''
+locale: en
+theme: light
+theme_preset: euan
+goals: {}
