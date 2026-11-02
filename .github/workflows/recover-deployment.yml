@@ -1,0 +1,38 @@
+name: Recover completed running dashboard build
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/recover-deployment.yml
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '13151110598'
+          run-id: '41460905410'
+          github-token: ${{ github.token }}
+          path: recovered
+      - name: Restore verified static build
+        run: |
+          mkdir -p dist
+          tar -xf recovered/artifact.tar -C dist
+          test -f dist/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          name: running-recovery
+          path: dist
+      - uses: actions/deploy-pages@v4
+        id: deployment
+        with:
+          artifact_name: running-recovery
