@@ -19,6 +19,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    outputs:
+      artifact_name: ${{ steps.artifact_identity.outputs.name }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,8 +66,12 @@ jobs:
           else
             PATH_PREFIX="/$REPO_NAME" pnpm build
           fi
+      - name: Choose a unique Pages artifact name
+        id: artifact_identity
+        run: echo "name=github-pages-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-pages-artifact@v3
         with:
+          name: ${{ steps.artifact_identity.outputs.name }}
           path: dist
 
   deploy:
@@ -80,3 +86,5 @@ jobs:
     steps:
       - uses: actions/deploy-pages@v4
         id: deployment
+        with:
+          artifact_name: ${{ needs.build.outputs.artifact_name }}
