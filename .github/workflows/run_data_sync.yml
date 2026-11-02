@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: running-pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -68,7 +68,10 @@ jobs:
           fi
       - name: Choose a unique Pages artifact name
         id: artifact_identity
-        run: echo "name=github-pages-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+        # Alphabetic IDs keep numeric athlete-ID secrets from masking job outputs.
+        run: |
+          artifact_id="$(printf '%s-%s' "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" | tr '0123456789' 'abcdefghij')"
+          echo "name=github-pages-$artifact_id" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-pages-artifact@v3
         with:
           name: ${{ steps.artifact_identity.outputs.name }}
