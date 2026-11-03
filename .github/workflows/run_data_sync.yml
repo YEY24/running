@@ -1,97 +1,17 @@
-name: Sync and publish running dashboard
+name: Public publishing paused for privacy
 
 on:
-  push:
-    branches: [main, master]
-    paths-ignore:
-      - .github/workflows/recover-deployment.yml
   workflow_dispatch:
-  schedule:
-    # Every six hours at 05:17, 11:17, 17:17, and 23:17 UTC.
-    # Berlin: 06:17/12:17/18:17/00:17 CET; one hour later during CEST.
-    # GitHub can delay or miss a scheduled trigger; the next check catches up.
-    - cron: '17 5,11,17,23 * * *'
 
 permissions:
   contents: read
 
-concurrency:
-  group: running-pages
-  cancel-in-progress: true
-
 jobs:
-  build:
+  privacy_notice:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    outputs:
-      artifact_name: ${{ steps.artifact_identity.outputs.name }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - name: Test exporter
-        run: python -m unittest discover -s scripts -p 'test_*.py'
-      - name: Export running data (credentials never enter command arguments)
-        env:
-          INTERVALS_ICU_ATHLETE_ID: ${{ secrets.INTERVALS_ICU_ATHLETE_ID }}
-          INTERVALS_ICU_API_KEY: ${{ secrets.INTERVALS_ICU_API_KEY }}
-          PUBLISH_ROUTES: ${{ vars.PUBLISH_ROUTES || 'true' }}
-          SYNC_START_DATE: ${{ vars.SYNC_START_DATE || '2000-01-01' }}
-          EVENT_NAME: ${{ github.event_name }}
-        shell: bash
+      - name: Public publishing is paused
         run: |
-          if [[ -n "$INTERVALS_ICU_API_KEY" && -n "$INTERVALS_ICU_ATHLETE_ID" ]]; then
-            python scripts/sync_intervals.py
-          elif [[ "$EVENT_NAME" == "schedule" ]]; then
-            echo "::error::Set both Intervals.icu repository secrets to activate scheduled sync."
-            exit 1
-          else
-            echo "No credentials configured: publishing the empty dashboard only."
-          fi
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '8.9.0'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - name: Build with the correct Pages base path
-        env:
-          REPO_NAME: ${{ github.event.repository.name }}
-          OWNER: ${{ github.repository_owner }}
-        run: |
-          if [[ "${REPO_NAME,,}" == "${OWNER,,}.github.io" ]]; then
-            PATH_PREFIX='' pnpm build
-          else
-            PATH_PREFIX="/$REPO_NAME" pnpm build
-          fi
-      - name: Choose a unique Pages artifact name
-        id: artifact_identity
-        # Alphabetic IDs keep numeric athlete-ID secrets from masking job outputs.
-        run: |
-          artifact_id="$(printf '%s-%s' "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" | tr '0123456789' 'abcdefghij')"
-          echo "name=github-pages-$artifact_id" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          name: ${{ steps.artifact_identity.outputs.name }}
-          path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/deploy-pages@v4
-        id: deployment
-        with:
-          artifact_name: ${{ needs.build.outputs.artifact_name }}
+          echo "No running data is fetched, uploaded, or deployed by this workflow."
+          echo "Unpublish the existing site in repository Settings > Pages."
+          echo "Private hosting must be configured before synchronization resumes."
