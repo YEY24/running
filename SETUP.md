@@ -6,7 +6,7 @@ Prepared 2 November 2026 for GitHub user **YEY24**. The intended repository is `
 
 - An English, responsive running journal with cream and teal styling, light/dark themes, totals, a 12-week chart, activity heatmap, filterable log, calendar, and interactive GPS map.
 - Your dashboard starts empty. Upstream example runs are not presented as yours.
-- A daily GitHub Actions workflow that reads Intervals.icu and deploys to GitHub Pages.
+- A GitHub Actions workflow that reads Intervals.icu every six hours and deploys to GitHub Pages.
 - The public fields are running dates/times, distance, moving time, derived pace, elevation, activity ID, and GPS route. Titles are replaced with “Run”; heart rate, descriptions, wellness, and contact data are excluded.
 - Intervals credentials are read from GitHub Secrets. No downloaded activities are committed back to source control. The chosen public data are, necessarily, downloadable in the deployed site assets.
 
@@ -64,7 +64,18 @@ Before secrets are configured, a manual/push run can publish the honest empty da
 
 ## 5. Scheduled synchronization
 
-The saved schedule is **05:17 UTC every day**: **06:17 CET in winter**, **07:17 CEST in summer**. GitHub may delay scheduled runs; this is not an exact delivery guarantee. In a public repository, GitHub may disable scheduled workflows after 60 days without repository activity. Re-enable the workflow in Actions if needed.
+The saved schedule checks **every six hours**, at **05:17, 11:17, 17:17, and 23:17 UTC**. In Berlin this is **06:17, 12:17, 18:17, and 00:17 in winter**; each check is one hour later during summer time. This schedule was updated on 3 November 2026 after a morning trigger did not appear in GitHub's run history despite the workflow remaining active. GitHub can delay or miss scheduled triggers, so another check later in the day provides a chance to catch up. This is not an exact delivery guarantee.
+
+If a run is missing:
+
+1. Confirm it appears in Intervals.icu. If it does not, check the HealthFit export first.
+2. Open https://github.com/YEY24/running/actions/workflows/run_data_sync.yml while signed in.
+3. Click **Run workflow**, leave **main** selected, and click the green **Run workflow** button.
+4. Allow about **10–15 minutes** for the full history and GPS routes. Wait for both **build** and **deploy** to finish with green checks.
+5. Reload https://yey24.github.io/running/ and check its **Updated** time. If necessary, press **Command–Shift–R** on Mac.
+6. If a job is red, open the failed step. An authentication error may require replacing the Intervals API key directly in **Settings → Secrets and variables → Actions**. Never paste it into chat or code.
+
+No daily maintenance or running computer is needed. Keep HealthFit's export to Intervals.icu enabled and check the Actions history occasionally. In a public repository, GitHub automatically disables scheduled workflows after 60 days without repository activity. If GitHub shows a disabled-workflow notice, re-enable it in Actions and run one manual update.
 
 Each run fetches a full snapshot from the configured start date. This reflects activity edits and deletions, unlike an append-only history. Routes are fetched afresh to avoid retaining a removed route. No raw workout cache is restored. Large histories can take several minutes. The job allows 45 minutes, retries transient failures, and limits route-request frequency.
 
