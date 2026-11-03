@@ -7,8 +7,10 @@ on:
       - .github/workflows/recover-deployment.yml
   workflow_dispatch:
   schedule:
-    # Daily 05:17 UTC = 06:17 CET / 07:17 CEST. GitHub can delay scheduled runs.
-    - cron: '17 5 * * *'
+    # Every six hours at 05:17, 11:17, 17:17, and 23:17 UTC.
+    # Berlin: 06:17/12:17/18:17/00:17 CET; one hour later during CEST.
+    # GitHub can delay or miss a scheduled trigger; the next check catches up.
+    - cron: '17 5,11,17,23 * * *'
 
 permissions:
   contents: read
